@@ -31,7 +31,8 @@ public class Level {
 	public Tile[] tiles;
 	public List<Entity>[] entityMap;
 	public List<Entity> entities = new ArrayList<Entity>();
-	private Bitmap minimap;
+	private Bitmap minimap, displaymap;
+	private boolean largeMap = false, smallMap = false;
 	private boolean seen[];
 	final int[] neighbourOffsets;
 
@@ -49,7 +50,11 @@ public class Level {
 		this.height = height;
 
 		minimap = new Bitmap(width, height);
-
+		displaymap = new Bitmap(64, 64);
+		
+		largeMap = height > 64 && height > 64;
+		smallMap = height < 64 && height < 64;
+		
 		tiles = new Tile[width * height];
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -463,8 +468,76 @@ public class Level {
 				}
 			}
 		}
+		
+		// Display the real map!
+		if(largeMap){
+			int locx = x0 + 8;
+			int locy = y0 + 8;
+			int drawx = 0, drawy = 0;
+			int mapx = 0, mapy = 0;
+			int endx = 0, endy = 0;
+			
+			if(locx < 64){
+				drawx = 0;
+				endx = 64;
+			}
+			else if(locx > width - 64){
+				drawx = width - 64;
+				endx = width;
+			}
+			else{
+				drawx = locx;
+				endx = locx + 64;
+			}
+			
+			if(locy < 64){
+				drawy = 0;
+				endy = 64;
+			}
+			else if(locy > height - 64){
+				drawy = height - 64;
+				endy = height;
+			}
+			else{
+				drawy = locy;
+				endy = locy + 64;
+			}
+			
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
+					if(x >= drawx && x <= endx && y >= drawy && y < endy - 1){
+						displaymap.pixels[mapx + mapy * 64] = minimap.pixels[x + y * width]; 
+						mapx++;
+					}
+				}
+				mapx = 0;
+				
+				if(y >= drawy && y < endy - 1)
+					mapy++;
+			}
+		} else if(smallMap){
+			int smallx = 0, smally = 0;
+			
+			for (int y = 0; y < 64; y++) {
+				for (int x = 0; x < 64; x++) {
+					if(x >= (32 - width/2) && x <= (32 + width/2) && y >= (32 - height/2) && y < (32 + height/2) - 1){
+						displaymap.pixels[x + y * 64] = minimap.pixels[smallx + smally * width];
+						smallx++;
+					}
+					else
+						displaymap.pixels[x + y * 64] = 0xff000000;
+				}
+				smallx = 0;
+				
+				if(y >= (32 - height/2) && y < (32 + height/2) - 1)
+					smally++;
+			}
+		} else {
+			displaymap = minimap;
+		}
+		
 		screen.blit(Art.panel, 0, screen.h - 80);
-		screen.blit(minimap, 429, screen.h - 80 + 5);
+		screen.blit(displaymap, 429, screen.h - 80 + 5);
 		
 		String player1score =  MojamComponent.texts.score(Team.Team1, player1Score * 100 / TARGET_SCORE);
 		Font.draw(screen, player1score, 280-player1score.length()*10, screen.h - 20); //adjust so it fits in the box

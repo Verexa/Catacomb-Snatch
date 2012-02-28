@@ -318,7 +318,7 @@ public class MojamComponent extends Canvas implements Runnable,
 		// }
 
 		int toTick = 0;
-
+		
 		long lastRenderTime = System.nanoTime();
 		int min = 999999999;
 		int max = 0;
