@@ -35,6 +35,10 @@ public class Level {
 		} 
 	}
 	
+	private void loadLevel(){
+		
+	}
+	
 	private void checkObjectives(){
 		boolean completed = false;
 		

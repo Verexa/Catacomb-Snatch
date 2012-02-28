@@ -76,7 +76,7 @@ public class Level {
 
 
 	public void setTile(int x, int y, Tile tile) {
-		final int index = x + y * width;
+ 		final int index = x + (y * width);
 		tiles[index] = tile;
 		tile.init(this, x, y);
 		for (int of : neighbourOffsets) {
@@ -92,7 +92,7 @@ public class Level {
 	public Tile getTile(int x, int y) {
 		if (x < 0 || y < 0 || x >= width || y >= height)
 			return null;
-		return tiles[x + y * width];
+		return tiles[x + (y * width)];
 	}
 
 	public Tile getTile(Vec2 pos) {
@@ -301,7 +301,7 @@ public class Level {
 							* Tile.HEIGHT);
 					continue;
 				}
-				int xt = x - 28;
+				int xt = x - (width / 2) + 4;
 				int yt = y - 4;
 				if (xt >= 0 && yt >= 0 && xt < 7 && yt < 4
 						&& (xt != 3 || yt < 3)) {
@@ -310,7 +310,7 @@ public class Level {
 					continue;
 				}
 
-				yt = y - (64 - 8);
+				yt = y - (height - 8);
 				if (xt >= 0 && yt >= 0 && xt < 7 && yt < 4
 						&& (xt != 3 || yt > 0)) {
 					screen.blit(Art.startLordLard[xt][yt], x * Tile.WIDTH, y
